@@ -47,7 +47,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [currentChatSession, setCurrentChatSession] = useState<ChatSession | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {

@@ -9,28 +9,28 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
   min-height: 100vh;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: #d1d5db;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #9ca3af;
 }
 
 /* Chat message animations */
@@ -55,7 +55,7 @@ body {
     transform: translateY(0);
   }
   30% {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 }
 
@@ -73,7 +73,7 @@ body {
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -92,8 +92,8 @@ body {
 }
 
 .quiz-option:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Progress bar animation */
@@ -109,12 +109,12 @@ body {
 
 /* Card hover effects */
 .card-hover {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* Markdown content styling */
@@ -126,6 +126,18 @@ body {
   margin-bottom: 0.5em;
 }
 
+.markdown-content h1 {
+  font-size: 1.25rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.125rem;
+}
+
+.markdown-content h3 {
+  font-size: 1rem;
+}
+
 .markdown-content p {
   margin-bottom: 0.75em;
   line-height: 1.6;
@@ -133,7 +145,7 @@ body {
 
 .markdown-content ul,
 .markdown-content ol {
-  margin-left: 1.5em;
+  margin-left: 1.25em;
   margin-bottom: 0.75em;
 }
 
@@ -145,14 +157,15 @@ body {
   background: #f3f4f6;
   padding: 0.125em 0.375em;
   border-radius: 0.25em;
-  font-size: 0.875em;
+  font-size: 0.85em;
+  font-family: 'Fira Code', 'Monaco', monospace;
 }
 
 .markdown-content pre {
-  background: #1f2937;
-  color: #f9fafb;
+  background: #1e293b;
+  color: #f1f5f9;
   padding: 1em;
-  border-radius: 0.5em;
+  border-radius: 0.75em;
   overflow-x: auto;
   margin-bottom: 1em;
 }
@@ -161,4 +174,39 @@ body {
   background: transparent;
   color: inherit;
   padding: 0;
+}
+
+/* Flashcard flip animation */
+@keyframes flipIn {
+  from {
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotateY(0);
+    opacity: 1;
+  }
+}
+
+.flashcard-flip {
+  animation: flipIn 0.3s ease-out;
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

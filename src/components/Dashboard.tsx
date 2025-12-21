@@ -1,19 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Send, 
-  Bot, 
-  User, 
-  Sparkles, 
-  Loader2, 
-  BookOpen, 
-  Lightbulb,
-  Clock,
-  CheckCircle,
-  TrendingUp,
-  ChevronRight,
+import {
+  Send,
+  Bot,
+  User,
+  Sparkles,
+  Loader2,
+  BookOpen,
   Flame,
-  Zap,
-  Target
+  ClipboardList,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useApp } from '../context/AppContext';
@@ -21,13 +17,13 @@ import { chatWithStudyBuddy } from '../services/geminiService';
 import { ChatMessage } from '../types';
 
 const Dashboard: React.FC = () => {
-  const { user, studyMaterials, learningProgress, quizzes, setActiveTab } = useApp();
+  const { user, studyMaterials, learningProgress, setActiveTab } = useApp();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'model'; parts: { text: string }[] }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -96,97 +92,72 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const suggestedTopics = [
-    { name: "Newton's Laws", color: "bg-blue-100 text-blue-700" },
-    { name: "Motion & Forces", color: "bg-purple-100 text-purple-700" },
-    { name: "Energy", color: "bg-green-100 text-green-700" }
-  ];
-
+  // Stats from learning progress
   const stats = {
     streak: learningProgress?.streakDays || 5,
-    quizzesCompleted: quizzes?.length || 55,
-    studyTime: learningProgress?.studyTimeTotal || 120
+    quizzesCompleted: learningProgress?.totalQuizzesTaken || 55
   };
+
+  const suggestedTopics = [
+    { name: "Newton's Laws", color: 'bg-blue-100 text-blue-700' },
+    { name: 'Motion & Forces', color: 'bg-purple-100 text-purple-700' },
+    { name: 'Energy', color: 'bg-green-100 text-green-700' }
+  ];
 
   return (
     <div className="h-full flex gap-6">
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Main Chat Section */}
+      <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-gray-100">
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Hello, {user?.displayName?.split(' ')[0] || 'Student'}! 👋
-          </h1>
-          <p className="text-gray-500 mt-1">What do you want to learn today?</p>
-        </div>
-
-        {/* Chat Input */}
-        <div className="px-6 py-4">
-          <div className="relative">
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 border border-gray-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100">
-              <Sparkles className="w-5 h-5 text-gray-400" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="What is Newton's second law of motion?"
-                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isLoading}
-                className="w-10 h-10 bg-[#1e3a5f] hover:bg-[#2a4a73] disabled:bg-gray-300 text-white rounded-lg flex items-center justify-center transition-colors"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
+        <div className="px-6 py-4 border-b border-gray-100 bg-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-800">
+                Hello, {user?.displayName?.split(' ')[0] || 'Student'}!
+              </h1>
+              <p className="text-gray-500 text-sm">What do you want to learn today?</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 rounded-lg">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <span className="text-sm font-medium text-orange-600">30%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-500" />
+                <span className="text-sm text-gray-600">Starlance AI</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        {/* Chat Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Bot className="w-8 h-8 text-blue-600" />
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
+                <Bot className="w-8 h-8 text-white" />
               </div>
-              <p className="text-gray-600 mb-4">
-                Ask me anything about your subjects!
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Ask me anything about your studies!
+              </h3>
+              <p className="text-gray-500 text-sm max-w-md mb-6">
+                I can help you understand concepts, solve problems, and create study materials.
               </p>
-              <div className="text-left w-full max-w-lg bg-gray-50 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-blue-600" />
+              
+              {/* Example question */}
+              <div className="bg-gray-50 rounded-xl p-4 max-w-lg w-full text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-xs">?</span>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-gray-700 text-sm">
-                      <strong>Newton's second law of motion</strong> states that the force acting on an object is equal to the mass of the object times its acceleration.
-                    </p>
-                    <p className="text-gray-600 text-sm mt-2 font-medium">F = m × a</p>
-                    <div className="mt-3 space-y-2 text-sm text-gray-600">
-                      <p>Key points to remember:</p>
-                      <ol className="list-decimal list-inside space-y-1">
-                        <li>Newton's second law of motion states the relationship between force and acceleration</li>
-                        <li>The formula shows how mass affects acceleration</li>
-                        <li>Force can be measured in Newtons (N)</li>
-                      </ol>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="text-xs px-2 py-1 bg-red-50 text-red-600 rounded-full">
-                        🔴 Prerequisite: Forces & Motion basics
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-3">
-                      💡 Understand common misconceptions about Newton's Laws
-                    </p>
-                  </div>
+                  <span className="text-sm text-gray-600">Try asking:</span>
                 </div>
+                <p 
+                  className="text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                  onClick={() => setInputMessage("What is Newton's second law of motion?")}
+                >
+                  "What is Newton's second law of motion?"
+                </p>
               </div>
             </div>
           ) : (
@@ -200,25 +171,25 @@ const Dashboard: React.FC = () => {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     message.role === 'user'
-                      ? 'bg-[#1e3a5f] text-white'
-                      : 'bg-blue-100 text-blue-600'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
                   }`}
                 >
                   {message.role === 'user' ? (
-                    <User className="w-5 h-5" />
+                    <User className="w-4 h-4" />
                   ) : (
-                    <Bot className="w-5 h-5" />
+                    <Bot className="w-4 h-4" />
                   )}
                 </div>
                 <div
                   className={`max-w-[75%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
-                      ? 'bg-[#1e3a5f] text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {message.role === 'assistant' ? (
-                    <div className="markdown-content text-sm">
+                    <div className="markdown-content prose prose-sm max-w-none">
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   ) : (
@@ -231,8 +202,8 @@ const Dashboard: React.FC = () => {
           
           {isLoading && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-blue-600" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <Bot className="w-4 h-4 text-white" />
               </div>
               <div className="bg-gray-100 rounded-2xl px-4 py-3">
                 <div className="flex gap-1">
@@ -246,71 +217,137 @@ const Dashboard: React.FC = () => {
           
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Action Tags */}
+        {messages.length > 0 && (
+          <div className="px-6 py-2 flex gap-2 flex-wrap">
+            <button 
+              onClick={() => setInputMessage("Explain common misconceptions about Newton's Laws")}
+              className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium hover:bg-purple-100 transition-colors flex items-center gap-1"
+            >
+              <AlertCircle className="w-3 h-3" />
+              Proactive mistake-caught above
+            </button>
+            <button 
+              onClick={() => setInputMessage("Give me examples of Newton's second law")}
+              className="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors"
+            >
+              Explore examples
+            </button>
+            <button 
+              onClick={() => setInputMessage("Understand common misconceptions about Newton's Laws")}
+              className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors"
+            >
+              Understand misconceptions
+            </button>
+          </div>
+        )}
+
+        {/* Input Area */}
+        <div className="border-t border-gray-100 p-4 bg-white">
+          <div className="flex gap-3 items-end">
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Ask me anything..."
+                className="w-full resize-none border border-gray-200 rounded-xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                rows={1}
+                style={{ minHeight: '48px', maxHeight: '120px' }}
+              />
+            </div>
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || isLoading}
+              className="w-11 h-11 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Right Sidebar - Stats */}
       <div className="w-72 space-y-4 hidden xl:block">
         {/* Learning Overview Card */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-gray-500 mb-4">Your Learning Overview</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-medium text-gray-600 mb-4">Your Learning Overview</h3>
           
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Flame className="w-6 h-6 text-blue-600" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-800">{stats.streak}</p>
+                  <p className="text-xs text-gray-500">days</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-800">{stats.streak} <span className="text-sm font-normal text-gray-500">days</span></p>
-                <p className="text-xs text-gray-500">Current streak</p>
-              </div>
+              <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">streak</span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <ClipboardList className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-800">{stats.quizzesCompleted}</p>
+                  <p className="text-xs text-gray-500">quizzes</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-800">{stats.quizzesCompleted} <span className="text-sm font-normal text-gray-500">quizzes</span></p>
-                <p className="text-xs text-gray-500">completed</p>
-              </div>
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">completed</span>
             </div>
           </div>
         </div>
 
         {/* Suggested Topics */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-gray-500 mb-4">Suggested Topics</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-medium text-gray-600 mb-3">Suggested Topics</h3>
           <div className="space-y-2">
             {suggestedTopics.map((topic, index) => (
               <button
                 key={index}
-                onClick={() => setInputMessage(`Explain ${topic.name}`)}
-                className={`w-full text-left px-4 py-3 rounded-xl ${topic.color} hover:opacity-80 transition-opacity flex items-center justify-between`}
+                onClick={() => setInputMessage(`Explain ${topic.name} to me`)}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-80 ${topic.color}`}
               >
-                <span className="font-medium text-sm">{topic.name}</span>
-                <ChevronRight className="w-4 h-4" />
+                {topic.name}
               </button>
             ))}
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-br from-[#1e3a5f] to-[#2a4a73] rounded-2xl shadow-sm p-5 text-white">
-          <h3 className="text-sm font-semibold text-white/80 mb-4">Quick Actions</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-medium text-gray-600 mb-3">Quick Actions</h3>
           <div className="space-y-2">
             <button 
-              onClick={() => setActiveTab('quizzes')}
-              className="w-full text-left px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors flex items-center gap-3"
+              onClick={() => setActiveTab('quiz')}
+              className="w-full flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
             >
-              <Zap className="w-5 h-5" />
-              <span className="text-sm font-medium">Generate Quiz</span>
+              <ClipboardList className="w-4 h-4" />
+              Take a Quiz
             </button>
             <button 
               onClick={() => setActiveTab('revision')}
-              className="w-full text-left px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors flex items-center gap-3"
+              className="w-full flex items-center gap-2 px-3 py-2 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition-colors"
             >
-              <Target className="w-5 h-5" />
-              <span className="text-sm font-medium">Start Revision</span>
+              <BookOpen className="w-4 h-4" />
+              Revision Mode
+            </button>
+            <button 
+              onClick={() => setActiveTab('analytics')}
+              className="w-full flex items-center gap-2 px-3 py-2 bg-cyan-50 text-cyan-700 rounded-lg text-sm font-medium hover:bg-cyan-100 transition-colors"
+            >
+              <TrendingUp className="w-4 h-4" />
+              View Analytics
             </button>
           </div>
         </div>
