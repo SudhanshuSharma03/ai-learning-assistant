@@ -10,8 +10,6 @@ import {
   Trash2,
   ClipboardList,
   Play,
-  Clock,
-  Target,
   ChevronRight,
   ChevronLeft,
   RotateCcw,
