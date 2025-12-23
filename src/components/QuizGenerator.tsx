@@ -47,6 +47,14 @@ const QuizGenerator: React.FC = () => {
   const [quizStarted, setQuizStarted] = useState(false);
   const [activeView, setActiveView] = useState<'generate' | 'history'>('generate');
 
+  const handleSelectQuizFromHistory = (quiz: Quiz) => {
+    setGeneratedQuiz(quiz);
+    setSelectedAnswers(new Array(quiz.questions.length).fill(null));
+    setCurrentQuestionIndex(0);
+    setShowResults(false);
+    setQuizStarted(true);
+  };
+
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     for (const file of acceptedFiles) {
       const newFile: UploadedFile = {
@@ -598,10 +606,15 @@ const QuizGenerator: React.FC = () => {
       ) : (
         /* Quiz History */
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <p className="text-sm text-gray-500 mb-4">Click on a quiz to take it again</p>
           {quizzes.length > 0 ? (
             <div className="space-y-3">
               {quizzes.map((quiz, index) => (
-                <div key={quiz.id || index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                <div 
+                  key={quiz.id || index} 
+                  onClick={() => handleSelectQuizFromHistory(quiz)}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-colors cursor-pointer"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                       <ClipboardList className="w-5 h-5 text-blue-600" />
@@ -615,7 +628,10 @@ const QuizGenerator: React.FC = () => {
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
                       {quiz.subject}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <button className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+                      <Play className="w-3 h-3" />
+                      Take Quiz
+                    </button>
                   </div>
                 </div>
               ))}

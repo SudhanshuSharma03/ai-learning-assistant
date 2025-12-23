@@ -94,15 +94,21 @@ const Dashboard: React.FC = () => {
 
   // Stats from learning progress
   const stats = {
-    streak: learningProgress?.streakDays || 5,
-    quizzesCompleted: learningProgress?.totalQuizzesTaken || 55
+    streak: learningProgress?.streakDays || 0,
+    quizzesCompleted: learningProgress?.totalQuizzesTaken || 0
   };
 
-  const suggestedTopics = [
-    { name: "Newton's Laws", color: 'bg-blue-100 text-blue-700' },
-    { name: 'Motion & Forces', color: 'bg-purple-100 text-purple-700' },
-    { name: 'Energy', color: 'bg-green-100 text-green-700' }
-  ];
+  // Generate suggested topics from study materials or defaults
+  const suggestedTopics = studyMaterials.length > 0
+    ? studyMaterials.slice(0, 3).map((m, i) => ({
+        name: m.subject || m.title,
+        color: ['bg-blue-100 text-blue-700', 'bg-purple-100 text-purple-700', 'bg-green-100 text-green-700'][i]
+      }))
+    : [
+        { name: 'Upload your first study material', color: 'bg-blue-100 text-blue-700' },
+        { name: 'Ask me anything', color: 'bg-purple-100 text-purple-700' },
+        { name: 'Take a quiz', color: 'bg-green-100 text-green-700' }
+      ];
 
   return (
     <div className="h-full flex gap-6">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, BookOpen, Target, Brain, ArrowRight, Loader2, Bot, HelpCircle, ClipboardList, BarChart3 } from 'lucide-react';
+import { Sparkles, BookOpen, ArrowRight, Loader2, Bot, HelpCircle, ClipboardList, BarChart3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const LandingPage: React.FC = () => {
